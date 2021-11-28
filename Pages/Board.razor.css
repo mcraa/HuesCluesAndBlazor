@@ -1,0 +1,19 @@
+﻿
+
+.color-tile {
+    border: 1px solid black;
+    line-height: 56px;
+    padding: 18px 0px;
+}
+
+.color-row {
+    flex-direction: row;
+    white-space: nowrap;
+    width: 100vw;
+}
+
+.tiles-container {
+    overflow-x: auto;
+    display: flex;
+    flex-direction: column;
+}
