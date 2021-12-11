@@ -40,6 +40,10 @@
         line-height: 3rem;
     }
 
+    .nav-item.px-3 {
+        padding-right: 0 !important
+    }
+
 .nav-item ::deep a.active {
     background-color: rgba(255,255,255,0.25);
     color: white;
@@ -48,6 +52,9 @@
 .nav-item ::deep a:hover {
     background-color: rgba(255,255,255,0.1);
     color: white;
+}
+.pad-r-15 {
+    padding-right: 15px;
 }
 
 @media (min-width: 641px) {
