@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "blazorwasm",
+        "name": "Debug Blazor Wasm",
+        "request": "launch",
+        "debugServer": 9222,
+        "cwd": "${workspaceFolder}/Server",
+        "url": "https://localhost:7126"
+      }
+    ]
+  }

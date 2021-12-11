@@ -1,0 +1,35 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <div class=@sidebarClass >
+        <NavMenu />
+        <button class="btn btn-secondary" @onclick="ToggleWidth">@toggleText</button>
+    </div>
+
+    <main>
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+
+    private static List<string> sidebarClasses = new List<string> {
+        "sidebar sidebar-closed",
+        "sidebar"
+    };
+
+    private static List<string> toggleTexts = new List<string> {
+        ">>",
+        "<< Collapse"
+    };
+    private int classIndex = 0;
+    private string sidebarClass = sidebarClasses.ElementAt(0);
+    private string toggleText = toggleTexts.ElementAt(0);
+    public void ToggleWidth() {
+        ++classIndex;
+        sidebarClass = sidebarClasses.ElementAt(classIndex % 2);
+        toggleText = toggleTexts.ElementAt(classIndex % 2);
+    }
+}

@@ -62,6 +62,11 @@ main {
         top: 0;
     }
 
+    .sidebar-closed {
+        width: 50px;
+        overflow: hidden;
+    }
+
     .top-row {
         position: sticky;
         top: 0;

@@ -9,11 +9,8 @@
 .color-row {
     flex-direction: row;
     white-space: nowrap;
-    width: 100vw;
 }
 
 .tiles-container {
     overflow-x: auto;
-    display: flex;
-    flex-direction: column;
 }
