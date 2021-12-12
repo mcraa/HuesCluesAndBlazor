@@ -3,10 +3,18 @@
 .color-tile {
     border: 1px solid black;
     display: inline-flex;
-    font-size: 28px;
     width: 80px;
     height: 80px;
     overflow: hidden;
+    vertical-align: bottom;
+    text-shadow: 2px 2px 0px white;
+    white-space: normal;
+    word-break: break-word;
+}
+
+.heading {
+    font-size: 28px;
+    vertical-align: bottom;
 }
 
 .color-row {

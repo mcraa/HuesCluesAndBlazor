@@ -12,16 +12,24 @@
         <div class="color-row">
             @for(int j=0; j<=_colorsCount; ++j) {
                 if (i == 0 && j != 0) {
-                    <span class="color-tile">  @(Convert.ToChar(j + 64))  </span>
+                    <span class="color-tile heading">  @(Convert.ToChar(j + 64))  </span>
                 } else {
                     if (j == 0 && i != 0) {
-                        <span class="color-tile">  @(i)  </span>
+                        <span class="color-tile heading">  @(i)  </span>
                     } else {
+                        if (i == 0 && j == 0) {
+                            <span class="color-tile">&nbsp;</span>
+                            continue;
+                        }
+
+                        var x = i;
+                        var y = j;
                         <span 
+                            @onclick="@(e => ClickTile(x, y))"
                             class="color-tile" 
-                            style=@($"color: {GetHslForCoordinate(i,j)}; background-color: {GetHslForCoordinate(i,j)}")
+                            style=@($"background-color: {GetHslForCoordinate(i,j)}")
                         > 
-                            [@i.ToString("00"), @j] 
+                            @(GetTileValue(i, j))
                         </span>
                     }
                 }
@@ -30,10 +38,38 @@
     }
 </div>
 
-@if (true) {}
+@if (_welcomeScreen) {
+    <div class="modal fade show" tabindex="-1" style="display: block;" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Join game as</h5>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="userInput">Name*</label>
+                            <input type="text" class="form-control" id="userInput" @bind="userInput" />
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <label for="serverUrlInput">Server address:</label>
+                            <input type="text" class="form-control" id="serverUrlInput" @bind="serverUrlInput" />
+                            <small id="serverUrlHelp" class="form-text text-muted">Optional, defaults to current url</small>
+                        </div>
+                    </form>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @onclick="JoinGame">Go!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
-    
+
     protected override void OnInitialized() {
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
 
@@ -45,11 +81,42 @@
         if (!string.IsNullOrEmpty(ColorsCount) && Int32.TryParse(ColorsCount, out int ccnt)) 
         {
             _colorsCount = ccnt;
-        } 
+        }         
+
+        initBoard();
+    }
+
+    private void initBoard() {
+        _boardState = new List<List<string>>();
+        for (var i = 0; i <= _colorsCount; ++i) {
+            _boardState.Add(new List<string>());
+            for (var j = 0; j <=_colorsCount; ++j) {
+                _boardState[i].Add("");
+            }
+        }
+    }
+
+    public void ClickTile(int i, int j) {
+        _boardState[i][j] = UserName;
+    }
+
+    public void JoinGame() {
+        UserName = userInput;
+        _welcomeScreen = false;
     }
 
     [Parameter]
     public string? ColorsCount { get; set; }
+
+    public string UserName { get; set; } = "";
+
+    private string? serverUrlInput;
+
+    private string? userInput;
+
+    private bool _welcomeScreen { get; set; } = true;
+
+    private List<List<string>> _boardState { get; set; } = new List<List<string>>();
     
     private int _colorsCount { get; set; } = 16;
 
@@ -57,5 +124,14 @@
         
         return $"hsl({x * 360 / _colorsCount }, {y * 100 / _colorsCount}%, {(2 * _colorsCount - (y+x)) * 97 / _colorsCount / 2}%)";
     }
- 
+
+    public string GetTileValue(int i, int j) {
+        if (i < _boardState.Count) {
+            if (j < _boardState[i].Count) {
+                return _boardState[i][j];
+            } 
+        } 
+
+        return "";
+    } 
 }
