@@ -2,8 +2,11 @@
 
 .color-tile {
     border: 1px solid black;
-    line-height: 56px;
-    padding: 18px 0px;
+    display: inline-flex;
+    font-size: 28px;
+    width: 80px;
+    height: 80px;
+    overflow: hidden;
 }
 
 .color-row {

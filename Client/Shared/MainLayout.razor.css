@@ -68,6 +68,7 @@ main {
 
     .sidebar-closed {
         width: 65px;
+        min-width: 65px;
         overflow: hidden;
     }
 
