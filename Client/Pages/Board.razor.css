@@ -25,3 +25,9 @@
 .tiles-container {
     overflow-x: auto;
 }
+
+.players-list {
+    width: 10px;
+    height: 20px;
+    border: 1px solid red;
+}

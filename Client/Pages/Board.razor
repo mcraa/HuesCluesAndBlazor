@@ -1,6 +1,9 @@
 ﻿@page "/board"
 
+@using HuesCluesAndBlazor.Shared.Enums
+@using Microsoft.AspNetCore.SignalR.Client
 @using Microsoft.AspNetCore.WebUtilities
+@using HuesCluesAndBlazor.Shared.Models
 
 @inject NavigationManager NavigationManager
 
@@ -38,6 +41,15 @@
     }
 </div>
 
+<div class="players-list">
+    <ol>
+        @for (int i = 0; i < _gameState.Players.Count; i++)
+        {
+            <li>@_gameState.Players[i].Name</li>
+        }
+    </ol>
+</div>
+
 @if (_welcomeScreen) {
     <div class="modal fade show" tabindex="-1" style="display: block;" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
@@ -69,8 +81,25 @@
 }
 
 @code {
+    private HubConnection? hubConnection;
 
-    protected override void OnInitialized() {
+    [Parameter]
+    public string? ColorsCount { get; set; }
+
+    public PlayerAndState? Player { get; set; }
+
+    private GameState _gameState {get; set;}
+
+    private string? serverUrlInput;
+
+    private string? userInput;
+
+    private bool _welcomeScreen { get; set; } = true;
+    
+    private int _colorsCount { get; set; } = 16;
+
+    protected override async Task OnInitializedAsync() {
+
         var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
 
         if (QueryHelpers.ParseQuery(uri.Query).TryGetValue(nameof(ColorsCount), out var value))
@@ -84,41 +113,64 @@
         }         
 
         initBoard();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/boardhub"))
+            .Build();
+
+        hubConnection.On<GameState, string>(MessageTypes.ClientHandleUpdate, (gameState, cId) =>
+        {
+            _gameState = gameState;            
+            StateHasChanged();
+        });
+
+        hubConnection.On<string, GameState>(MessageTypes.ClientRegisterName, (cId, gameState) =>
+        {
+            var currentPlayer = gameState.Players
+                .Where(p => string.Equals(p.Id, cId))
+                .ToList()
+                .First();
+            
+            currentPlayer.Name = userInput;
+
+            if (gameState.Board.Count == 0) {
+                gameState.Board = _gameState.Board;
+            } else {
+                _colorsCount = _gameState.Board.Count;
+            }
+
+            hubConnection.SendAsync(MessageTypes.ServerSyncUpdate, gameState).Wait();
+
+            StateHasChanged();
+        });
     }
 
     private void initBoard() {
-        _boardState = new List<List<string>>();
+
+        _gameState = new GameState {
+            Board = new List<List<string>>(),
+            Players = new List<PlayerAndState>()
+        };
+
         for (var i = 0; i <= _colorsCount; ++i) {
-            _boardState.Add(new List<string>());
+            _gameState.Board.Add(new List<string>());
             for (var j = 0; j <=_colorsCount; ++j) {
-                _boardState[i].Add("");
+                _gameState.Board[i].Add("");
             }
-        }
+        }       
     }
 
-    public void ClickTile(int i, int j) {
-        _boardState[i][j] = UserName;
+    public async Task ClickTile(int i, int j) {
+        _gameState.Board[i][j] = userInput ;
+
+        await hubConnection.SendAsync(MessageTypes.ServerSyncUpdate, _gameState);
     }
 
-    public void JoinGame() {
-        UserName = userInput;
+    public async Task JoinGame() { 
+
+        await hubConnection.StartAsync();
         _welcomeScreen = false;
-    }
-
-    [Parameter]
-    public string? ColorsCount { get; set; }
-
-    public string UserName { get; set; } = "";
-
-    private string? serverUrlInput;
-
-    private string? userInput;
-
-    private bool _welcomeScreen { get; set; } = true;
-
-    private List<List<string>> _boardState { get; set; } = new List<List<string>>();
-    
-    private int _colorsCount { get; set; } = 16;
+    }   
 
     public string GetHslForCoordinate(int x, int y) {
         
@@ -126,9 +178,9 @@
     }
 
     public string GetTileValue(int i, int j) {
-        if (i < _boardState.Count) {
-            if (j < _boardState[i].Count) {
-                return _boardState[i][j];
+        if (i < _gameState.Board.Count) {
+            if (j < _gameState.Board[i].Count) {
+                return _gameState.Board[i][j];
             } 
         } 
 
