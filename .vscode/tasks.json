@@ -7,7 +7,7 @@
         "type": "process",
           "args": [
             "build",
-            "${workspaceFolder}/Server/HuesCluesAndBlazor.Server.csproj",
+            "${workspaceFolder}/src/Server/HuesCluesAndBlazor.Server.csproj",
             "/property:GenerateFullPaths=true",
             "/consoleloggerparameters:NoSummary",
           ],
