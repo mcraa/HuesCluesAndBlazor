@@ -31,5 +31,7 @@ dotnet run
 - [x] Join game with name
 - [x] Show names and clicks real time
 - [ ] Enforce game rules
+- [ ] Lobby
+- [ ] Settings
 - [ ] Calculate points
 - [ ] Player guide
