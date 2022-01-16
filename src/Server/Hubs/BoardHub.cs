@@ -21,23 +21,24 @@ namespace HuesCluesAndBlazor.Server.Hubs
             // TODO sync state in a clever way
             _game.GameState = newState;
 
-            await Clients.All.SendAsync(MessageTypes.ClientHandleUpdate, _game.GameState, Context.ConnectionId);
+            await Clients.All.SendAsync(MessageTypes.ClientHandleUpdate, _game.GameState);
         }
 
         public override async Task OnConnectedAsync()
         {
             // add user to game
             _game.AddNewPlayer(Context.ConnectionId);
-            // send current game state
+            // reply newjoiner with his id and gamestate
             await Clients.Caller.SendAsync(MessageTypes.ClientRegisterName, Context.ConnectionId, _game.GameState);
 
             await base.OnConnectedAsync();
         }
 
-        public override Task OnDisconnectedAsync(Exception? exception)
+        public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            // TODO remove user
-            return base.OnDisconnectedAsync(exception);
+            _game.RemovePlayerById(Context.ConnectionId);
+            await Clients.All.SendAsync(MessageTypes.ClientHandleUpdate, _game.GameState);
+            await base.OnDisconnectedAsync(exception);
         }
     }
 }

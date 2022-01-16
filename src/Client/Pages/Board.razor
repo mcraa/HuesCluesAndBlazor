@@ -118,7 +118,7 @@
             .WithUrl(NavigationManager.ToAbsoluteUri("/boardhub"))
             .Build();
 
-        hubConnection.On<GameState, string>(MessageTypes.ClientHandleUpdate, (gameState, cId) =>
+        hubConnection.On<GameState>(MessageTypes.ClientHandleUpdate, (gameState) =>
         {
             _gameState = gameState;            
             StateHasChanged();
@@ -136,7 +136,7 @@
             if (gameState.Board.Count == 0) {
                 gameState.Board = _gameState.Board;
             } else {
-                _colorsCount = _gameState.Board.Count;
+                _colorsCount = gameState.Board.Count-1;
             }
 
             hubConnection.SendAsync(MessageTypes.ServerSyncUpdate, gameState).Wait();

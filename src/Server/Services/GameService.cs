@@ -7,7 +7,7 @@ public interface IGameService {
     void AddPlayer(PlayerAndState player);
     void AddNewPlayer(string name);
     void RemovePlayer(PlayerAndState player);
-    void RemovePlayerById(int id);
+    void RemovePlayerById(string id);
     void RegisterPlayerMove(PlayerAndState player, int x, int y);
     void DealNewTurn();
     void CalculateScore();
@@ -66,8 +66,12 @@ public class GameService : IGameService
         throw new NotImplementedException();
     }
 
-    public void RemovePlayerById(int id)
+    public void RemovePlayerById(string id)
     {
-        throw new NotImplementedException();
+        var player = GameState.Players
+            .Where(p => p.Id == id)
+            .First();
+
+        GameState.Players.Remove(player);
     }
 }
